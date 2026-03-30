@@ -1,0 +1,74 @@
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - BookShop">BookShop</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Pastel Theme -->
+    <link rel="stylesheet" th:href="@{/css/pastel.css}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand"><i class="fas fa-book-open"></i> PastelBooks</a>
+        <div class="nav-links">
+            <a href="/sanpham"><i class="fas fa-store"></i> Cửa Hàng</a>
+            
+            <a sec:authorize="isAnonymous()" href="/login"><i class="fas fa-user-circle"></i> Đăng Nhập</a>
+            <a sec:authorize="isAnonymous()" href="/register"><i class="fas fa-user-plus"></i> Đăng Ký</a>
+            
+            <span sec:authorize="isAuthenticated()" style="color: var(--text-dark); margin-left: 1.5rem; font-weight: 600;">
+                <i class="fas fa-user"></i> <span sec:authentication="name">User</span>
+            </span>
+            
+            <a sec:authorize="isAuthenticated()" href="/giohang"><i class="fas fa-shopping-cart"></i> Giỏ Hàng</a>
+            
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" style="background:transparent; border:none; cursor:pointer; color:var(--text-dark); margin-left: 1.5rem; font-weight: 500; font-family: 'Inter', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='#ff9fb2';" onmouseout="this.style.color='var(--text-dark)';">
+                    <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content Injection -->
+    <main layout:fragment="content">
+        <!-- Content will be replaced here -->
+    </main>
+
+    <!-- Global Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        function showToast(message, isSuccess = true) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${isSuccess ? 'toast-success' : 'toast-error'}`;
+            
+            const icon = isSuccess ? '<i class="fas fa-check-circle fa-lg"></i>' : '<i class="fas fa-exclamation-circle fa-lg"></i>';
+            
+            toast.innerHTML = `
+                ${icon}
+                <div style="flex-1">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

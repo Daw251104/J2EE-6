@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Giỏ Hàng Của Bạn</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container">
+        
+        <h2><i class="fas fa-shopping-cart" style="color: var(--accent-pink);"></i> Giỏ Hàng Của Bạn</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Xem lại các sách bạn đã chọn trước khi thanh toán.</p>
+
+        <div th:if="${cartItems == null || cartItems.isEmpty()}" style="text-align: center; padding: 5rem 0;">
+            <i class="fas fa-box-open" style="font-size: 4rem; color: #ddd; margin-bottom: 1rem;"></i>
+            <h3>Giỏ hàng của bạn đang trống!</h3>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Hãy quay lại cửa hàng để chọn thêm những cuốn sách yêu thích.</p>
+            <a href="/sanpham" class="btn-primary" style="text-decoration: none; padding: 1rem 2rem; display: inline-block; width: auto;">Tiếp tục mua sắm</a>
+        </div>
+
+        <div th:if="${cartItems != null && !cartItems.isEmpty()}" class="shop-layout">
+            
+            <!-- Cart Table -->
+            <div class="product-content cart-container">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${cartItems}">
+                            <td style="width: 100px;">
+                                <img th:src="${(item.hinhDaiDien != null && !item.hinhDaiDien.isEmpty()) ? item.hinhDaiDien : 'https://placehold.co/400x500/f8f9fa/a0a0a0?text=No+Image'}" alt="Product" class="cart-item-img">
+                            </td>
+                            <td>
+                                <div class="cart-item-title" th:text="${item.tenSP}">Tên sản phẩm</div>
+                                <div style="font-size: 0.85rem; color: var(--text-light);">Mã SP: <span th:text="${item.maSP}"></span></div>
+                            </td>
+                            <td>
+                                <span class="cart-price" th:text="${#numbers.formatDecimal(item.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">100,000 đ</span>
+                            </td>
+                            <td>
+                                <span class="cart-qty" th:text="${item.soLuong}">1</span>
+                            </td>
+                            <td>
+                                <span class="cart-price" style="color: var(--accent-pink);" th:text="${#numbers.formatDecimal(item.getTotal(), 0, 'COMMA', 0, 'POINT')} + ' đ'">100,000 đ</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cart Summary Sidebar -->
+            <aside class="filters" style="width: 300px; padding: 0;">
+                <div class="cart-summary">
+                    <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--text-dark);">Tổng Quan</h3>
+                    
+                    <div class="summary-row">
+                        <span>Số sản phẩm:</span>
+                        <span style="font-weight: 600;" th:text="${cartItems.size()}">0</span>
+                    </div>
+
+                    <div class="summary-row summary-total">
+                        <span>Tổng tiền:</span>
+                        <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
+
+                    <button class="btn-primary" style="margin-top: 1.5rem; width: 100%; padding: 1rem;">Tiến Hành Thanh Toán <i class="fas fa-arrow-right" style="margin-left: 0.5rem;"></i></button>
+                    <a href="/sanpham" class="btn-secondary" style="margin-top: 1rem; width: 100%; display: block; text-align: center; text-decoration: none; box-sizing: border-box;">Tiếp tục mua hàng</a>
+                </div>
+            </aside>
+
+        </div>
+
+    </div>
+</body>
+</html>

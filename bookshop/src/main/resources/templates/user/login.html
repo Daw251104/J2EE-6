@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Đăng Nhập</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <i class="fas fa-book-open"></i>
+                    <h2>Chào mừng trở lại</h2>
+                    <p style="color: var(--text-light); margin-top: 0.5rem;">Đăng nhập để vào thế giới sách của bạn</p>
+                </div>
+
+                <!-- Thong bao loi (Neu co) -->
+                <div th:if="${param.error}" class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> Tài khoản hoặc mật khẩu không chính xác!
+                </div>
+                
+                <!-- Thong bao thanh cong (Neu co) -->
+                <div th:if="${param.logout}" class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Bạn đã đăng xuất thành công!
+                </div>
+
+                <form th:action="@{/login}" method="post" class="auth-form">
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên đăng nhập của bạn" required autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 1rem;">
+                        Đăng Nhập <i class="fas fa-sign-in-alt" style="margin-left: 0.5rem;"></i>
+                    </button>
+
+                    <div class="auth-links">
+                        <a href="#">Quên mật khẩu?</a>
+                        <a href="/register">Chưa có tài khoản? Đăng ký ngay</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

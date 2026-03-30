@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Cửa Hàng</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container">
+        
+        <div class="shop-layout">
+            <!-- Sidebar Filters -->
+            <aside class="filters">
+                <form action="/sanpham" method="get" id="filterForm">
+                    <div class="filter-group">
+                        <label for="keyword"><i class="fas fa-search"></i> Tìm kiếm</label>
+                        <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control" placeholder="Nhập tên sản phẩm...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="maLoai"><i class="fas fa-tags"></i> Danh mục</label>
+                        <select id="maLoai" name="maLoai" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                            <option value="">Tất cả danh mục</option>
+                            <option th:each="loai : ${loaiSanPhams}" 
+                                    th:value="${loai.maLoai}" 
+                                    th:text="${loai.tenLoai}"
+                                    th:selected="${loai.maLoai == maLoai}"></option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="sort"><i class="fas fa-sort"></i> Sắp xếp giá</label>
+                        <select id="sort" name="sort" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                            <option value="asc" th:selected="${sort == 'asc'}">Giá tăng dần</option>
+                            <option value="desc" th:selected="${sort == 'desc'}">Giá giảm dần</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Áp dụng</button>
+                    <a href="/sanpham" class="btn-secondary" style="display: block; text-align: center; margin-top: 10px; text-decoration: none;">Xóa lọc</a>
+                </form>
+            </aside>
+
+            <!-- Product Grid Area -->
+            <div class="product-content">
+                <div class="product-header">
+                    <h2>Danh sách sản phẩm</h2>
+                    <span th:text="${sanPhamPage.totalElements} + ' sản phẩm được tìm thấy'" style="color: var(--text-light);"></span>
+                </div>
+
+                <div class="product-grid">
+                    <!-- Product Item -->
+                    <div class="product-card" th:each="sp : ${sanPhamPage.content}">
+                        <img th:src="${(sp.hinhDaiDien != null && !sp.hinhDaiDien.isEmpty()) ? sp.hinhDaiDien : 'https://placehold.co/400x500/f8f9fa/a0a0a0?text=No+Image'}" alt="Product Image" class="product-img">
+                        <div class="product-info">
+                            <span class="product-category" th:text="${sp.tenLoaiSanPham}">Category</span>
+                            <h3 class="product-title" th:text="${sp.tenSP}">Product Name</h3>
+                            <div class="product-price" th:text="${#numbers.formatDecimal(sp.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">100,000 đ</div>
+                            <button type="button" class="btn-primary" th:onclick="'addToCart(' + ${sp.maSP} + ')'">
+                                <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" th:if="${sanPhamPage.totalPages > 1}">
+                    <!-- Prev Button -->
+                    <a th:href="@{/sanpham(page=${sanPhamPage.number - 1}, keyword=${keyword}, maLoai=${maLoai}, sort=${sort})}" 
+                       th:classappend="${sanPhamPage.first ? 'disabled' : ''}" 
+                       class="page-link" 
+                       th:style="${sanPhamPage.first ? 'pointer-events:none; opacity:0.5;' : ''}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <!-- Page Numbers -->
+                    <a th:each="pageNo : ${#numbers.sequence(0, sanPhamPage.totalPages - 1)}"
+                       th:href="@{/sanpham(page=${pageNo}, keyword=${keyword}, maLoai=${maLoai}, sort=${sort})}"
+                       th:text="${pageNo + 1}"
+                       th:classappend="${pageNo == sanPhamPage.number ? 'active' : ''}"
+                       class="page-link">1</a>
+
+                    <!-- Next Button -->
+                    <a th:href="@{/sanpham(page=${sanPhamPage.number + 1}, keyword=${keyword}, maLoai=${maLoai}, sort=${sort})}" 
+                       th:classappend="${sanPhamPage.last ? 'disabled' : ''}" 
+                       class="page-link"
+                       th:style="${sanPhamPage.last ? 'pointer-events:none; opacity:0.5;' : ''}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            function addToCart(sanPhamId) {
+                fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sanPhamId: sanPhamId,
+                        soLuong: 1
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => { throw new Error(data.message || 'Lỗi hệ thống'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showToast(data.message, true);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast(error.message || 'Có lỗi xảy ra', false);
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>
